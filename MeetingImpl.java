@@ -14,11 +14,11 @@ public abstract class MeetingImpl implements Meeting {
 		}
 
 		if (date == null) {
-			throw new IllegalArgumentException("Date can't be null.");
+			throw new NullPointerException("Date can't be null.");
 		}
 
 		if (contacts == null) {
-			throw new IllegalArgumentException("Contacts can't be null.");
+			throw new NullPointerException("Contacts can't be null.");
 		}
 
 		if (contacts.size() == 0) {

@@ -28,12 +28,12 @@ public class MeetingTest {
 		Meeting meeting = new MockMeeting(0, this.aDate, this.contacts);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testContructorWithANullDate() {
 		Meeting meeting = new MockMeeting(1, null, this.contacts);
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testContructorWithANullContact() {
 		Meeting meeting = new MockMeeting(1, this.aDate, null);
 	}
