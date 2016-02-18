@@ -43,7 +43,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if there is a meeting with that ID happening
 	* in the past
 	*/
-	FutureMeeting getFutureMeeting(int id);
+	// FutureMeeting getFutureMeeting(int id);
 
 	/**
 	* Returns the meeting with the requested ID, or null if it there is none.
@@ -51,7 +51,7 @@ public interface ContactManager {
 	* @param id the ID for the meeting
 	* @return the meeting with the requested ID, or null if it there is none.
 	*/
-	Meeting getMeeting(int id);
+	// Meeting getMeeting(int id);
 
 	/**
 	* Returns the list of future meetings scheduled with this contact.
@@ -65,7 +65,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if the contact does not exist
 	* @throws NullPointerException if the contact is null
 	*/
-	List<Meeting> getFutureMeetingList(Contact contact);
+	// List<Meeting> getFutureMeetingList(Contact contact);
 
 	/**
 	* Returns the list of meetings that are scheduled for, or that took
@@ -79,7 +79,7 @@ public interface ContactManager {
 	* @return the list of meetings
 	* @throws NullPointerException if the date are null
 	*/
-	List<Meeting> getMeetingListOn(Calendar date);
+	// List<Meeting> getMeetingListOn(Calendar date);
 
 	/**
 	* Returns the list of past meetings in which this contact has participated.
@@ -93,7 +93,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if the contact does not exist
 	* @throws NullPointerException if the contact is null
 	*/
-	List<PastMeeting> getPastMeetingListFor(Contact contact);
+	// List<PastMeeting> getPastMeetingListFor(Contact contact);
 
 	/**
 	* Create a new record for a meeting that took place in the past.
@@ -120,7 +120,7 @@ public interface ContactManager {
 	* @throws IllegalStateException if the meeting is set for a date in the future
 	* @throws NullPointerException if the notes are null
 	*/
-	PastMeeting addMeetingNotes(int id, String text);
+	// PastMeeting addMeetingNotes(int id, String text);
 
 	/**
 	* Create a new contact with the specified name and notes.
@@ -131,7 +131,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if the name or the notes are empty strings
 	* @throws NullPointerException if the name or the notes are null
 	*/
-	int addNewContact(String name, String notes);
+	// int addNewContact(String name, String notes);
 
 	/**
 	* Returns a list with the contacts whose name contains that string.
@@ -143,7 +143,7 @@ public interface ContactManager {
 	* @return a list with the contacts whose name contains that string.
 	* @throws NullPointerException if the parameter is null
 	*/
-	Set<Contact> getContacts(String name);
+	// Set<Contact> getContacts(String name);
 
 	/**
 	* Returns a list containing the contacts that correspond to the IDs.
@@ -154,7 +154,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if no IDs are provided or if
 	* any of the provided IDs does not correspond to a real contact
 	*/
-	Set<Contact> getContacts(int... ids);
+	// Set<Contact> getContacts(int... ids);
 
 	/**
 	* Save all data to disk.
@@ -162,6 +162,6 @@ public interface ContactManager {
 	* This method must be executed when the program is
 	* closed and when/if the user requests it.
 	*/
-	void flush();
+	// void flush();
 
 }
