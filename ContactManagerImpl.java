@@ -57,7 +57,6 @@ public class ContactManagerImpl implements ContactManager {
 		return key;
 	}
 
-	// @TODO
 	public PastMeeting getPastMeeting(int id) {
 
 		if (!this.meetings.containsKey(id)) {
@@ -71,25 +70,73 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalStateException("The selected meeting has a date in the future.");
 		}
 		
-		return null;
+		return (PastMeeting) meeting;
 	}
 
-	// //@TODO
-	// public FutureMeeting getFutureMeeting(int id) {
-	// 	return new FutureMeeting();
-	// }
+	public FutureMeeting getFutureMeeting(int id) {
+		
+		if (!this.meetings.containsKey(id)) {
+			return null;
+		}
 
-	// public Meeting getMeeting(int id) {
-	// 	return new Meeting();
-	// }
-	//  //@TODO
-	// public List<Meeting> getFutureMeetingList(Contact contact) {
+		Meeting meeting = this.meetings.get(id);
+		Calendar now    = Calendar.getInstance();
 
-	// }
+		if (meeting.getDate().before(now)) {
+			throw new IllegalStateException("The selected meeting has a date in the past.");
+		}
 
-	// //@TODO
+		return (FutureMeeting) meeting;
+	}
+
+	public Meeting getMeeting(int id) {
+		
+		if (!this.meetings.containsKey(id)) {
+			return null;
+		}
+
+		return this.meetings.get(id);
+	}
+
+	public List<Meeting> getFutureMeetingList(Contact contact) {
+
+		// @TODO - Implement the contact check
+
+		List<Meeting> futureMeetingList = new ArrayList<Meeting>();
+
+		if (!this.meetings.isEmpty()) {
+			Set<Integer> keys = this.meetings.keySet();
+			Iterator iterator = keys.iterator();
+
+			while (iterator.hasNext()) {
+				Meeting meeting = this.meetings.get(iterator.next());
+				Calendar now    = Calendar.getInstance();
+
+				if (!meeting.getDate().before(now)) {
+					Set<Contact> contacts = meeting.getContacts();
+
+					Iterator contactIterator = contacts.iterator();
+					while (contactIterator.hasNext()) {
+						Contact person = (Contact) contactIterator.next();
+
+						if (person.getId() == contact.getId()) {
+							futureMeetingList.add(meeting);
+						}
+					}
+				}
+			}
+		}
+
+		if (!futureMeetingList.isEmpty()) {
+			Collections.sort(futureMeetingList, new MeetingComparator());
+		}
+
+		return futureMeetingList;
+	}
+
+	// @TODO
 	// public List<Meeting> getMeetingListOn(Calendar date) {
-
+	// 	return null;
 	// }
 
 	// //@TODO
@@ -125,10 +172,14 @@ public class ContactManagerImpl implements ContactManager {
 
 	// }
 
-	// //@TODO
-	// public int addNewContact(String name, String notes) {
+	public int addNewContact(String name, String notes) {
 
-	// }
+		if (name == "") {
+			throw new IllegalArgumentException("Name cannot be an empty string.");
+		}
+
+		return 1;
+	}
 
 	// //@TODO
 	// public Set<Contact> getContacts(String name) {

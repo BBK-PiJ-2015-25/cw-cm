@@ -43,7 +43,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if there is a meeting with that ID happening
 	* in the past
 	*/
-	// FutureMeeting getFutureMeeting(int id);
+	FutureMeeting getFutureMeeting(int id);
 
 	/**
 	* Returns the meeting with the requested ID, or null if it there is none.
@@ -51,7 +51,7 @@ public interface ContactManager {
 	* @param id the ID for the meeting
 	* @return the meeting with the requested ID, or null if it there is none.
 	*/
-	// Meeting getMeeting(int id);
+	Meeting getMeeting(int id);
 
 	/**
 	* Returns the list of future meetings scheduled with this contact.
@@ -65,7 +65,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if the contact does not exist
 	* @throws NullPointerException if the contact is null
 	*/
-	// List<Meeting> getFutureMeetingList(Contact contact);
+	List<Meeting> getFutureMeetingList(Contact contact);
 
 	/**
 	* Returns the list of meetings that are scheduled for, or that took
@@ -131,7 +131,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if the name or the notes are empty strings
 	* @throws NullPointerException if the name or the notes are null
 	*/
-	// int addNewContact(String name, String notes);
+	int addNewContact(String name, String notes);
 
 	/**
 	* Returns a list with the contacts whose name contains that string.
