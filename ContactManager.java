@@ -143,7 +143,7 @@ public interface ContactManager {
 	* @return a list with the contacts whose name contains that string.
 	* @throws NullPointerException if the parameter is null
 	*/
-	// Set<Contact> getContacts(String name);
+	Set<Contact> getContacts(String name);
 
 	/**
 	* Returns a list containing the contacts that correspond to the IDs.
@@ -154,7 +154,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if no IDs are provided or if
 	* any of the provided IDs does not correspond to a real contact
 	*/
-	// Set<Contact> getContacts(int... ids);
+	Set<Contact> getContacts(int... ids);
 
 	/**
 	* Save all data to disk.

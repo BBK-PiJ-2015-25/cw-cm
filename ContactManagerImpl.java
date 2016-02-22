@@ -1,15 +1,17 @@
 import java.util.*;
 // import java.util.Set;
 // import java.util.Iterator;
-// import java.util.HashMap;
+// import java.util.LinkedHashMap;
 // import java.util.Arrays;
 
 public class ContactManagerImpl implements ContactManager {
 
-	private HashMap<Integer, Meeting> meetings;
+	private LinkedHashMap<Integer, Meeting> meetings;
+	private LinkedHashMap<Integer, Contact> contacts; 
 
 	ContactManagerImpl() {
-		this.meetings   = new HashMap<Integer, Meeting>();
+		this.meetings = new LinkedHashMap<Integer, Meeting>();
+		this.contacts = new LinkedHashMap<Integer, Contact>();
 	}
 
 	/**
@@ -20,8 +22,28 @@ public class ContactManagerImpl implements ContactManager {
 	 * @return int
 	 * @access private
 	 */
-	private int workoutNextIdIncrement() {
+	private int workoutNextIdIncrementForMeetings() {
 		Set<Integer> keys      = this.meetings.keySet();
+		Object[]     keysArray = keys.toArray();
+
+		int key = 1;
+		if (!keys.isEmpty()) {
+			key = (int) keysArray[keys.size() - 1] + 1;
+		}
+
+		return key;
+	}
+
+	/**
+	 * Works out the ID that should be assigned to the contact that
+	 * is being added to the Map. Takes the most recent ID (which will be
+	 * the key) and increments it by 1.
+	 *
+	 * @return int
+	 * @access private
+	 */
+	private int workoutNextIdIncrementForContacts() {
+		Set<Integer> keys      = this.contacts.keySet();
 		Object[]     keysArray = keys.toArray();
 
 		int key = 1;
@@ -50,7 +72,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("The set of contacts must have at least one contact.");
 		}
 		
-		int key = this.workoutNextIdIncrement();
+		int key = this.workoutNextIdIncrementForMeetings();
 		Meeting newMeeting = new FutureMeetingImpl(key, date, contacts);
 		this.meetings.put(key, newMeeting);
 
@@ -162,7 +184,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("The set of contacts must have at least one contact.");
 		}
 
-		int key = this.workoutNextIdIncrement();
+		int key = this.workoutNextIdIncrementForMeetings();
 		Meeting newPastMeeting = new PastMeetingImpl(key, date, contacts, text);
 		this.meetings.put(key, newPastMeeting);
 	}
@@ -174,22 +196,69 @@ public class ContactManagerImpl implements ContactManager {
 
 	public int addNewContact(String name, String notes) {
 
+		if (name == null) {
+			throw new IllegalArgumentException("Name cannot be null.");
+		}
+
+		if (notes == null) {
+			throw new IllegalArgumentException("Notes cannot be null.");
+		}
+
 		if (name == "") {
 			throw new IllegalArgumentException("Name cannot be an empty string.");
 		}
 
-		return 1;
+		if (notes == "") {
+			throw new IllegalArgumentException("Notes cannot be an empty string.");
+		}
+
+		int id = this.workoutNextIdIncrementForContacts();
+
+		Contact contact = new ContactImpl(id, name, notes);
+		this.contacts.put(id, contact);
+
+		return id;
 	}
 
-	// //@TODO
-	// public Set<Contact> getContacts(String name) {
+	public Set<Contact> getContacts(String name) {
 
-	// }
+		if (name == null) {
+			throw new NullPointerException("The contact name cannot be null.");
+		}
 
-	// //@TODO
-	// public Set<Contact> getContacts(int... ids) {
+		Set<Contact> contacts = new HashSet<Contact>();
+		Set<Integer> keys     = this.contacts.keySet();
+		Iterator iterator     = keys.iterator();
 
-	// }
+		while (iterator.hasNext()) {
+			Contact contact    = this.contacts.get(iterator.next());
+			String contactName = contact.getName();
+
+			if (name.equals("") || contactName.equals(name)) {
+				contacts.add(contact);
+			}
+		}
+
+		return contacts;
+	}
+
+	public Set<Contact> getContacts(int... ids) {
+
+		if (ids == null) {
+			throw new NullPointerException("The list of ids cannot be null.");
+		}
+
+		Set<Contact> contacts = new HashSet<Contact>();
+		int idsLength = ids.length;
+
+		for (int i = 0; i < idsLength; i++) {
+			if (this.contacts.containsKey(ids[i])) {
+				contacts.add(this.contacts.get(ids[i]));
+			}
+		}
+
+		return contacts;
+	}
 
 	// //@TODO
 	// public void flush() {

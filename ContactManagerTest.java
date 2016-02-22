@@ -285,8 +285,123 @@ public class ContactManagerTest {
 	}
 
 	@Test(expected=IllegalArgumentException.class)
-	public void testAddNewContactNullName() {
+	public void testAddNewContactEmptyStringName() {
 		ContactManager contactManager = new ContactManagerImpl();
 		contactManager.addNewContact("", "Some Notes");
 	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddNewContactEmptyStringNotes() {
+		ContactManager contactManager = new ContactManagerImpl();
+		contactManager.addNewContact("David Jones", "");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddNewContactNullName() {
+		ContactManager contactManager = new ContactManagerImpl();
+		contactManager.addNewContact(null, "Some Notes");
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddNewContactNullNotes() {
+		ContactManager contactManager = new ContactManagerImpl();
+		contactManager.addNewContact("David Jones", null);
+	}
+
+	@Test
+	public void testAddNewContact() {
+		ContactManager contactManager = new ContactManagerImpl();
+		int id = contactManager.addNewContact("David Jones", "Some Notes");
+
+		assertEquals("Adding new contact returns the wrong ID.", 1, id);
+	}
+
+	@Test
+	public void testAddNewContactCheckIdIncrementsCorrectly() {
+		ContactManager contactManager = new ContactManagerImpl();
+		int firstId  = contactManager.addNewContact("David Jones", "Some Notes");
+		int secondId = contactManager.addNewContact("David Jones", "Some Notes");
+		int thirdId  = contactManager.addNewContact("David Jones", "Some Notes");
+
+		assertEquals("Adding new contacts does not increment the ID properly.", 3, thirdId);
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testGetContactsNullName() {
+		ContactManager contactManager = new ContactManagerImpl();
+		String name = null;
+		Set<Contact> contacts = contactManager.getContacts(name);
+	}
+
+	@Test
+	public void testGetContactsEmptyList() {
+		ContactManager contactManager = new ContactManagerImpl();
+		Set<Contact> contacts = contactManager.getContacts("");
+
+		assertEquals("The returned contacts list should be empty.", true, contacts.isEmpty());
+	}
+
+	@Test
+	public void testGetContactsReturnAll() {
+		ContactManager contactManager = new ContactManagerImpl();
+
+		int firstId  = contactManager.addNewContact("David Jones", "Some Notes");
+		int secondId = contactManager.addNewContact("David Jones", "Some Notes");
+		int thirdId  = contactManager.addNewContact("David Jones", "Some Notes");
+
+		Set<Contact> contacts = contactManager.getContacts("");
+
+		assertEquals("Total number of contacts returned should be 3.", 3, contacts.size());
+	}
+
+	@Test
+	public void testGetContactsByName() {
+		ContactManager contactManager = new ContactManagerImpl();
+
+		int firstId  = contactManager.addNewContact("David Jones", "Some Notes");
+		int secondId = contactManager.addNewContact("David Jones", "Some Notes");
+		int thirdId  = contactManager.addNewContact("David", "Some Notes");
+
+		Set<Contact> contacts = contactManager.getContacts("David Jones");
+
+		assertEquals("Total number of contacts returned should be 2.", 2, contacts.size());
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testGetContactsWithNoIds() {
+		ContactManager contactManager = new ContactManagerImpl();
+		int[] ids = null;
+		Set<Contact> contacts = contactManager.getContacts(ids);
+	}
+
+	@Test
+	public void testGetContactsWithIdsButNoContactsExistYet() {
+		ContactManager contactManager = new ContactManagerImpl();
+		int[] ids = new int[2];
+		ids[0]    = 1;
+		ids[1]    = 2;
+
+		Set<Contact> contacts = contactManager.getContacts(ids);
+
+		assertEquals("The contacts set should be empty.", true, contacts.isEmpty());
+	}
+
+	@Test
+	public void testGetContactsWithIdsThatExist() {
+		ContactManager contactManager = new ContactManagerImpl();
+		int contactIdOne   = contactManager.addNewContact("David Jones", "Some Notes");
+		int contactIdTwo   = contactManager.addNewContact("John Smith", "Some Notes");
+		int contactIdThree = contactManager.addNewContact("Jane Doe", "Some Notes");
+
+		int[] ids = new int[3];
+		ids[0] = contactIdOne;
+		ids[1] = contactIdTwo;
+		ids[2] = contactIdThree;
+
+		Set<Contact> contacts = contactManager.getContacts(ids);
+
+		assertEquals("The contacts set should have size of 3.", 3, contacts.size());
+	}
+
+	
 }	
