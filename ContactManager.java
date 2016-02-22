@@ -79,7 +79,7 @@ public interface ContactManager {
 	* @return the list of meetings
 	* @throws NullPointerException if the date are null
 	*/
-	// List<Meeting> getMeetingListOn(Calendar date);
+	List<Meeting> getMeetingListOn(Calendar date);
 
 	/**
 	* Returns the list of past meetings in which this contact has participated.
@@ -93,7 +93,7 @@ public interface ContactManager {
 	* @throws IllegalArgumentException if the contact does not exist
 	* @throws NullPointerException if the contact is null
 	*/
-	// List<PastMeeting> getPastMeetingListFor(Contact contact);
+	List<PastMeeting> getPastMeetingListFor(Contact contact);
 
 	/**
 	* Create a new record for a meeting that took place in the past.

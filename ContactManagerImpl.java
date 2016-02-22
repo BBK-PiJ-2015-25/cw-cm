@@ -57,6 +57,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		if (contacts == null) {
 			throw new NullPointerException("Contacts cannot be null.");
@@ -89,6 +90,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public PastMeeting getPastMeeting(int id) {
 
 		if (!this.meetings.containsKey(id)) {
@@ -108,6 +110,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public FutureMeeting getFutureMeeting(int id) {
 		
 		if (!this.meetings.containsKey(id)) {
@@ -127,6 +130,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Meeting getMeeting(int id) {
 		
 		if (!this.meetings.containsKey(id)) {
@@ -139,6 +143,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 
 		if (!this.checkContactExists(contact)) {
@@ -177,19 +182,77 @@ public class ContactManagerImpl implements ContactManager {
 		return futureMeetingList;
 	}
 
-	// @TODO
-	// public List<Meeting> getMeetingListOn(Calendar date) {
-	// 	return null;
-	// }
+	@Override
+	public List<Meeting> getMeetingListOn(Calendar date) {
 
-	// //@TODO
-	// public List<Meeting> getPastMeetingListFor(Contact contact) {
+		if (date == null) {
+			throw new NullPointerException("The date cannot be null.");
+		}
 
-	// }
+		List<Meeting> meetings = new ArrayList<Meeting>();
+
+		/**
+		 * In order to get matches for the date and not time we will need to set
+		 * the time components to zero.
+		 */
+		date.set(Calendar.HOUR, 0);
+		date.set(Calendar.MINUTE, 0);
+		date.set(Calendar.SECOND, 0);
+
+		Set<Integer> keys = this.meetings.keySet();
+		Iterator iterator = keys.iterator();
+		while (iterator.hasNext()) {
+			Meeting meeting = this.meetings.get(iterator.next());
+			Calendar meetingDate = meeting.getDate();
+
+			meetingDate.set(Calendar.HOUR, 0);
+			meetingDate.set(Calendar.MINUTE, 0);
+			meetingDate.set(Calendar.SECOND, 0);
+
+			if (meetingDate.equals(date)) {
+				meetings.add(meeting);
+			}
+		}
+
+		return meetings;
+	}
+
+	@Override
+	public List<PastMeeting> getPastMeetingListFor(Contact contact) {
+
+		if (contact == null) {
+			throw new NullPointerException("The contact cannot be null.");
+		}
+
+		List<PastMeeting> meetings = new ArrayList<PastMeeting>();
+
+		Set<Integer> keys = this.meetings.keySet();
+		Iterator meetingIterator = keys.iterator();
+
+		while (meetingIterator.hasNext()) {
+			Meeting meeting = this.meetings.get(meetingIterator.next());
+
+			if (meeting instanceof  PastMeeting) {
+				Set<Contact> contacts = meeting.getContacts();
+				Iterator<Contact> contactIterator = contacts.iterator();
+
+				while (contactIterator.hasNext()) {
+					Contact meetingContact = contactIterator.next();
+
+					if (meetingContact.getId() == contact.getId()) {
+						meetings.add((PastMeeting) meeting);
+					}
+				}
+			}
+		}
+
+		return meetings;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
 
 		if (contacts == null) {
@@ -221,6 +284,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public int addNewContact(String name, String notes) {
 
 		if (name == null) {
@@ -250,6 +314,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Set<Contact> getContacts(String name) {
 
 		if (name == null) {
@@ -275,6 +340,7 @@ public class ContactManagerImpl implements ContactManager {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public Set<Contact> getContacts(int... ids) {
 
 		if (ids == null) {

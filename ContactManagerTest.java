@@ -381,5 +381,82 @@ public class ContactManagerTest {
 		assertEquals("The contacts set should have size of 3.", 3, contacts.size());
 	}
 
+	@Test(expected=NullPointerException.class)
+	public void testGetMeetingListOnWithNullDate() {
+		this.contactManager.getMeetingListOn(null);
+	}
 
+	@Test
+	public void testGetMeetingListOnWhereNoMeetingsHaveBeenSet() {
+		Calendar date = Calendar.getInstance();
+		date.add(Calendar.MONTH, 1);
+
+		List<Meeting> meetings = this.contactManager.getMeetingListOn(date);
+
+		assertEquals("We were expecting an empty list of meetings as non have been set yet.", true, meetings.isEmpty());
+	}
+
+	@Test
+	public void testGetMeetingListOnWhereMeetingsExistButDoNotMatchDate() {
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Some Notes");
+
+		Calendar date = Calendar.getInstance();
+		date.add(Calendar.MONTH, 1);
+
+		List<Meeting> meetings = this.contactManager.getMeetingListOn(date);
+
+		assertEquals("We are expecting an empty list of meetings as with a matching date been set yet.", true, meetings.isEmpty());
+	}
+
+	@Test
+	public void testGetMeetingListOnWhereMeetingsExistAndMatchDate() {
+		Calendar date = Calendar.getInstance();
+		date.add(Calendar.MONTH, 1);
+
+		this.contactManager.addFutureMeeting(this.contacts, date);
+		this.contactManager.addFutureMeeting(this.contacts, date);
+		this.contactManager.addFutureMeeting(this.contacts, date);
+
+		List<Meeting> meetings = this.contactManager.getMeetingListOn(date);
+
+		assertEquals("We are expecting 3 meetings to be returned.", 3, meetings.size());
+	}
+
+	@Test(expected=NullPointerException.class)
+	public void testGetPastMeetingListForNullContact() {
+		this.contactManager.getPastMeetingListFor(null);
+	}
+
+	@Test
+	public void testGetPastMeetingListForNoMeetings() {
+		Contact contact = new ContactImpl(1, "David Jones", "Some Notes");
+		List<PastMeeting> pastMeetings = this.contactManager.getPastMeetingListFor(contact);
+
+		assertEquals("We are expecting an empty list of past meetings.", true, pastMeetings.isEmpty());
+	}
+
+	@Test
+	public void testGetPastMeetingListForOnlyFutureMeetings() {
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+
+		List<PastMeeting> pastMeetings = this.contactManager.getPastMeetingListFor(this.contact);
+
+		assertEquals("The list should be empty as we have no past meetings.", true, pastMeetings.isEmpty());
+	}
+
+	@Test
+	public void testGetPastMeetingListForMixOfFutureAndPastMeetings() {
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Some notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Some notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Some notes");
+
+		List<PastMeeting> pastMeetings = this.contactManager.getPastMeetingListFor(this.contact);
+
+		assertEquals("The list should have three items inside.", 3, pastMeetings.size());
+	}
 }	
