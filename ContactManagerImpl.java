@@ -54,6 +54,9 @@ public class ContactManagerImpl implements ContactManager {
 		return key;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
 		if (contacts == null) {
 			throw new NullPointerException("Contacts cannot be null.");
@@ -71,6 +74,10 @@ public class ContactManagerImpl implements ContactManager {
 		if (contacts.isEmpty()) {
 			throw new IllegalArgumentException("The set of contacts must have at least one contact.");
 		}
+
+		if (!this.checkContactsExist(contacts)) {
+			throw new IllegalArgumentException("All contacts must exist in the contact manager. Use the method addNewContact to add a new contact.");
+		}
 		
 		int key = this.workoutNextIdIncrementForMeetings();
 		Meeting newMeeting = new FutureMeetingImpl(key, date, contacts);
@@ -79,6 +86,9 @@ public class ContactManagerImpl implements ContactManager {
 		return key;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public PastMeeting getPastMeeting(int id) {
 
 		if (!this.meetings.containsKey(id)) {
@@ -95,6 +105,9 @@ public class ContactManagerImpl implements ContactManager {
 		return (PastMeeting) meeting;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public FutureMeeting getFutureMeeting(int id) {
 		
 		if (!this.meetings.containsKey(id)) {
@@ -111,6 +124,9 @@ public class ContactManagerImpl implements ContactManager {
 		return (FutureMeeting) meeting;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Meeting getMeeting(int id) {
 		
 		if (!this.meetings.containsKey(id)) {
@@ -120,9 +136,14 @@ public class ContactManagerImpl implements ContactManager {
 		return this.meetings.get(id);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public List<Meeting> getFutureMeetingList(Contact contact) {
 
-		// @TODO - Implement the contact check
+		if (!this.checkContactExists(contact)) {
+			throw new IllegalArgumentException("The contact does not exist. You can add a new contact using the addNewContact method.");
+		}
 
 		List<Meeting> futureMeetingList = new ArrayList<Meeting>();
 
@@ -137,9 +158,9 @@ public class ContactManagerImpl implements ContactManager {
 				if (!meeting.getDate().before(now)) {
 					Set<Contact> contacts = meeting.getContacts();
 
-					Iterator contactIterator = contacts.iterator();
+					Iterator<Contact> contactIterator = contacts.iterator();
 					while (contactIterator.hasNext()) {
-						Contact person = (Contact) contactIterator.next();
+						Contact person = contactIterator.next();
 
 						if (person.getId() == contact.getId()) {
 							futureMeetingList.add(meeting);
@@ -166,6 +187,9 @@ public class ContactManagerImpl implements ContactManager {
 
 	// }
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
 
 		if (contacts == null) {
@@ -194,6 +218,9 @@ public class ContactManagerImpl implements ContactManager {
 
 	// }
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public int addNewContact(String name, String notes) {
 
 		if (name == null) {
@@ -220,6 +247,9 @@ public class ContactManagerImpl implements ContactManager {
 		return id;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Set<Contact> getContacts(String name) {
 
 		if (name == null) {
@@ -242,6 +272,9 @@ public class ContactManagerImpl implements ContactManager {
 		return contacts;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	public Set<Contact> getContacts(int... ids) {
 
 		if (ids == null) {
@@ -258,6 +291,47 @@ public class ContactManagerImpl implements ContactManager {
 		}
 
 		return contacts;
+	}
+
+	/**
+	 * Takes a set of contacts and loops through the saved contacts
+	 * a checks whether they exist. If any one of the contacts passed
+	 * into this method does not exist then false is returned. Otherwise
+	 * true is returned.
+	 *
+	 * @param  Set<Contact> a set of contacts
+	 * @return boolean
+	 * @author David Jones
+	 */
+	private boolean checkContactsExist(Set<Contact> contacts) {
+
+		Iterator<Contact> iterator = contacts.iterator();
+		while (iterator.hasNext()) {
+			Contact contact = iterator.next();
+
+			if (!this.contacts.containsKey(contact.getId())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Takes a single contacts and checks whether the contact exists.
+	 * If the contact does exist then true is returned otherwise false
+	 * is returned.
+	 *
+	 * @param  Contact the contact object being tested
+	 * @return boolean
+	 * @author David Jones
+	 */
+	private boolean checkContactExists(Contact contact) {
+		if (this.contacts.containsKey(contact.getId())) {
+			return true;
+		}
+
+		return false;
 	}
 
 	// //@TODO

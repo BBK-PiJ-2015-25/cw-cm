@@ -7,99 +7,97 @@ import java.util.*;
 
 public class ContactManagerTest {
 
-	private Contact contact;
-	private Set<Contact> contacts;
-	private Calendar aFutureDate;
-	private Calendar aPastDate;
+	private ContactManager contactManager;
+	private Set<Contact>   contacts;
+	private Contact 	   contact;
+	private Calendar 	   aFutureDate;
+	private Calendar 	   aPastDate;
 
 	@Before
 	public void setUp() {
 		Calendar futureDate = Calendar.getInstance();
 		futureDate.add(Calendar.YEAR, 1);
-		Calendar pastDate   = Calendar.getInstance();
-		pastDate.set(2010, 01, 01);
-
 		this.aFutureDate = futureDate;
-		this.aPastDate   = pastDate;
-		this.contacts    = new HashSet<Contact>();
-		Contact person   = new ContactImpl(1, "David Jones");
 
-		this.contact = person;
-		this.contacts.add(person);
+		Calendar pastDate = Calendar.getInstance();
+		pastDate.set(2010, 01, 01);
+		this.aPastDate   = pastDate;
+
+		ContactManager contactManager = new ContactManagerImpl();
+		int contactId = contactManager.addNewContact("David Jones", "Some notes");
+
+		this.contactManager = contactManager;
+		this.contacts = contactManager.getContacts("David Jones");
+
+		Set<Contact> contacts  = contactManager.getContacts(contactId);
+		Object[] contactsArray = contacts.toArray();
+		this.contact = (Contact) contactsArray[0];
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testAddFutureMeetingWithNullContacts() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addFutureMeeting(null, this.aFutureDate);
+		this.contactManager.addFutureMeeting(null, this.aFutureDate);
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testAddFutureMeetingWithNullDate() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addFutureMeeting(this.contacts, null);
+		this.contactManager.addFutureMeeting(this.contacts, null);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddFutureMeetingWithPastDate() {
-		Calendar pastDate = Calendar.getInstance();
-		pastDate.set(2014, 01, 01);
-
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addFutureMeeting(this.contacts, pastDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aPastDate);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddFutureMeetingWithAEmptySetOfContacts() {
 		Set<Contact> contacts = new HashSet<Contact>();
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addFutureMeeting(contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(contacts, this.aFutureDate);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddFutureMeetingWithNonExistingContact() {
+		this.contacts.add(new ContactImpl(999, "Unknown", "This contact doesn't exist."));
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 	}
 
 	@Test
 	public void testCorrectReturnValueFromAddFutureMeetingWithValidInput() {
-		ContactManager contactManager = new ContactManagerImpl();
-		int newKey = contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		int newKey = this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
 		assertEquals("The ID for the new future meeting was expected to be 1.", 1, newKey);
 	}
 
 	@Test
 	public void testCorrectReturnValueFromAddFutureMeetingMultipleMeetingsAdded() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
-		int newKey = contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		int newKey = this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
 		assertEquals("The ID for the new future meeting was expected to be 6.", 6, newKey);
 	}
 
 	@Test
 	public void testGetPastMeetingWithAnIdThatDoesntExist() {
-		ContactManager contactManager = new ContactManagerImpl();
-		PastMeeting pastMeeting 	  = contactManager.getPastMeeting(99);
+		PastMeeting pastMeeting = this.contactManager.getPastMeeting(99);
 
 		assertEquals("The value for past meeting was expected to be null.", null, pastMeeting);
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void testGetPastMeetingWithAFutureMeetingId() {
-		ContactManager contactManager = new ContactManagerImpl();
-		int futureMeetingId = contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-
-		PastMeeting pastMeeting = contactManager.getPastMeeting(futureMeetingId);
+		int futureMeetingId = this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		PastMeeting pastMeeting = this.contactManager.getPastMeeting(futureMeetingId);
 	}
 
 	@Test
 	public void testGetPastMeetingWithMeetingThatHasADateInThePast() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
-
-		PastMeeting pastMeeting = contactManager.getPastMeeting(1);
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		PastMeeting pastMeeting = this.contactManager.getPastMeeting(1);
 
 		// The addNewPastMethod does not return an ID so we need to assert by part of the meeting
 		assertEquals("The past meeting added did not match the past meeting returned.", "My Notes", pastMeeting.getNotes());
@@ -107,161 +105,146 @@ public class ContactManagerTest {
 
 	@Test(expected=NullPointerException.class)
 	public void testAddNexPastMeetingWithoutContacts() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewPastMeeting(null, this.aPastDate, "Hello Dave");
+		this.contactManager.addNewPastMeeting(null, this.aPastDate, "Hello Dave");
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testAddNexPastMeetingWithoutDate() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewPastMeeting(this.contacts, null, "Hello Dave");
+		this.contactManager.addNewPastMeeting(this.contacts, null, "Hello Dave");
 	}
 
 	@Test(expected=NullPointerException.class)
 	public void testAddNexPastMeetingWithoutText() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, null);
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, null);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddNexPastMeetingWithEmptyContactSet() {
-		ContactManager contactManager = new ContactManagerImpl();
 		Set<Contact> contacts = new HashSet<Contact>();
 
-		contactManager.addNewPastMeeting(contacts, this.aPastDate, "My Notes");
+		this.contactManager.addNewPastMeeting(contacts, this.aPastDate, "My Notes");
 	}
 
 	@Test
 	public void testAddNexPastMeetingWithValidData() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Hello Dave");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Hello Dave");
 	}
 
 	@Test
 	public void testGetFutureMeetingNonExistantMeeting() {
-		ContactManager contactManager = new ContactManagerImpl();
-		FutureMeeting futureMeeting = contactManager.getFutureMeeting(1);
+		FutureMeeting futureMeeting = this.contactManager.getFutureMeeting(1);
 
 		assertEquals("Future meeting return value should be null.", futureMeeting, null);
 	}
 
 	@Test(expected=IllegalStateException.class)
 	public void testGetFutureMeetingTargetMeetingInPast() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
 
-		FutureMeeting futureMeeting = contactManager.getFutureMeeting(1);
+		FutureMeeting futureMeeting = this.contactManager.getFutureMeeting(1);
 	}
 
 	@Test
 	public void testGetFutureMeetingValidMeeting() {
-		ContactManager contactManager = new ContactManagerImpl();
-		int futureMeetingId = contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-
-		FutureMeeting futureMeeting = contactManager.getFutureMeeting(futureMeetingId);
+		int futureMeetingId 		= this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		FutureMeeting futureMeeting = this.contactManager.getFutureMeeting(futureMeetingId);
 
 		assertEquals("Future meeting did not match the meeting that was added.", futureMeetingId, futureMeeting.getId());
 	}
 
 	@Test
 	public void testGetMeetingWithAMeetingThatDoesntExist() {
-		ContactManager contactManager = new ContactManagerImpl();
-		Meeting meeting = contactManager.getMeeting(999);
+		Meeting meeting = this.contactManager.getMeeting(999);
 
 		assertEquals("Meeting should be none existent and null should have been returned.", meeting, null);
 	}
 
 	@Test
 	public void testGetMeetingWithAValidId() {
-		ContactManager contactManager = new ContactManagerImpl();
-		int futureMeetingId = contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		Meeting meeting = contactManager.getMeeting(futureMeetingId);
+		int futureMeetingId = this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		Meeting meeting 	= this.contactManager.getMeeting(futureMeetingId);
 
 		assertEquals("Meeting should have the same ID of the meeting we added.", futureMeetingId, meeting.getId());
 	}
 
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetMeetingWithANonExistingContact() {
+		Contact contact = new ContactImpl(999, "Unknown", "This contact doesn't exist.");
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(contact);
+	}
+
 	@Test
 	public void testGetFutureMeetingListWithNoSavedMeetings() {
-		ContactManager contactManager = new ContactManagerImpl();
-		List<Meeting> meetings = contactManager.getFutureMeetingList(this.contact);
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(this.contact);
 
 		assertEquals("We were expecting the list to be empty.", 0, meetings.size());
 	}
 
 	@Test
 	public void testGetFutureMeetingListWithOnlySavedPastMeetings() {
-		ContactManager contactManager = new ContactManagerImpl();
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
 
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
-
-		List<Meeting> meetings = contactManager.getFutureMeetingList(this.contact);
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(this.contact);
 
 		assertEquals("We were expecting the list to be empty.", 0, meetings.size());
 	}
 
 	@Test
 	public void testGetFutureMeetingListWithExistingFutureMeetings() {
-		ContactManager contactManager = new ContactManagerImpl();
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-
-		List<Meeting> meetings = contactManager.getFutureMeetingList(this.contact);
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(this.contact);
 
 		assertEquals("We were expecting the number of meetings to match 3.", 3, meetings.size());
 	}
 
 	@Test
 	public void testGetFutureMeetingListWithAMixOfPastAndFutureMeetings() {
-		ContactManager contactManager = new ContactManagerImpl();
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
 
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
-		contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "My Notes");
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
-
-		List<Meeting> meetings = contactManager.getFutureMeetingList(this.contact);
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(this.contact);
 
 		assertEquals("We were expecting the number of meetings to match 4.", 4, meetings.size());
 	}
 
 	@Test
 	public void testGetFutureMeetingListWhereTheContactIsNotPartOfEveryMeeting() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
 
-		HashSet<Contact> contacts = new HashSet<Contact>();
-		Contact newContact = new ContactImpl(2, "Some guy");
-		contacts.add(newContact);
+		int id = this.contactManager.addNewContact("Some guy", "Some notes");
+		Set<Contact> contacts = this.contactManager.getContacts("");
 
-		contactManager.addFutureMeeting(contacts, this.aFutureDate);
+		this.contactManager.addFutureMeeting(contacts, this.aFutureDate);
 
-		List<Meeting> meetings = contactManager.getFutureMeetingList(newContact);
+		Contact newContact = this.contactManager.getContacts(id).iterator().next();
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(newContact);
 
 		assertEquals("We were expecting the number of meetings to match 1.", 1, meetings.size());
 	}
 
 	@Test
 	public void testGetFutureMeetingListInCorrectDateOrder() {
-		ContactManager contactManager = new ContactManagerImpl();
-
 		GregorianCalendar first  = new GregorianCalendar(2017, 01, 01);
 		GregorianCalendar second = new GregorianCalendar(2017, 01, 02);
 		GregorianCalendar third  = new GregorianCalendar(2017, 01, 03);
 
-		contactManager.addFutureMeeting(this.contacts, third);
-		contactManager.addFutureMeeting(this.contacts, first);
-		contactManager.addFutureMeeting(this.contacts, second);
+		this.contactManager.addFutureMeeting(this.contacts, third);
+		this.contactManager.addFutureMeeting(this.contacts, first);
+		this.contactManager.addFutureMeeting(this.contacts, second);
 
-		List<Meeting> meetings = contactManager.getFutureMeetingList(this.contact);
+		List<Meeting> meetings = this.contactManager.getFutureMeetingList(this.contact);
 
 		Meeting firstMeeting = meetings.get(0);
 		Meeting secondMeeting = meetings.get(1);
@@ -286,26 +269,22 @@ public class ContactManagerTest {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddNewContactEmptyStringName() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewContact("", "Some Notes");
+		this.contactManager.addNewContact("", "Some Notes");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddNewContactEmptyStringNotes() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewContact("David Jones", "");
+		this.contactManager.addNewContact("David Jones", "");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddNewContactNullName() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewContact(null, "Some Notes");
+		this.contactManager.addNewContact(null, "Some Notes");
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testAddNewContactNullNotes() {
-		ContactManager contactManager = new ContactManagerImpl();
-		contactManager.addNewContact("David Jones", null);
+		this.contactManager.addNewContact("David Jones", null);
 	}
 
 	@Test
@@ -313,12 +292,13 @@ public class ContactManagerTest {
 		ContactManager contactManager = new ContactManagerImpl();
 		int id = contactManager.addNewContact("David Jones", "Some Notes");
 
-		assertEquals("Adding new contact returns the wrong ID.", 1, id);
+		assertEquals("Adding new contact returns the wrong ID, we were expecting an ID of 1.", 1, id);
 	}
 
 	@Test
 	public void testAddNewContactCheckIdIncrementsCorrectly() {
 		ContactManager contactManager = new ContactManagerImpl();
+
 		int firstId  = contactManager.addNewContact("David Jones", "Some Notes");
 		int secondId = contactManager.addNewContact("David Jones", "Some Notes");
 		int thirdId  = contactManager.addNewContact("David Jones", "Some Notes");
@@ -328,9 +308,8 @@ public class ContactManagerTest {
 
 	@Test(expected=NullPointerException.class)
 	public void testGetContactsNullName() {
-		ContactManager contactManager = new ContactManagerImpl();
 		String name = null;
-		Set<Contact> contacts = contactManager.getContacts(name);
+		Set<Contact> contacts = this.contactManager.getContacts(name);
 	}
 
 	@Test
@@ -369,9 +348,8 @@ public class ContactManagerTest {
 
 	@Test(expected=NullPointerException.class)
 	public void testGetContactsWithNoIds() {
-		ContactManager contactManager = new ContactManagerImpl();
 		int[] ids = null;
-		Set<Contact> contacts = contactManager.getContacts(ids);
+		Set<Contact> contacts = this.contactManager.getContacts(ids);
 	}
 
 	@Test
@@ -403,5 +381,5 @@ public class ContactManagerTest {
 		assertEquals("The contacts set should have size of 3.", 3, contacts.size());
 	}
 
-	
+
 }	
