@@ -120,7 +120,7 @@ public interface ContactManager {
 	* @throws IllegalStateException if the meeting is set for a date in the future
 	* @throws NullPointerException if the notes are null
 	*/
-	// PastMeeting addMeetingNotes(int id, String text);
+	PastMeeting addMeetingNotes(int id, String text);
 
 	/**
 	* Create a new contact with the specified name and notes.

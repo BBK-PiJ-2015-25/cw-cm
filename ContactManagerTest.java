@@ -459,4 +459,29 @@ public class ContactManagerTest {
 
 		assertEquals("The list should have three items inside.", 3, pastMeetings.size());
 	}
+
+	@Test(expected=NullPointerException.class)
+	public void testAddMeetingNotesWithNullNotes() {
+		this.contactManager.addMeetingNotes(1, null);
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testAddMeetingNotesMeetingDoesntExist() {
+		this.contactManager.addMeetingNotes(1, "Some notes");
+	}
+
+	@Test(expected=IllegalStateException.class)
+	public void testAddMeetingNotesMeetingInFuture() {
+		int futureMeetingId = this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addMeetingNotes(futureMeetingId, "Some notes");
+
+	}
+
+	@Test
+	public void testAddMeetingNotesMeetingInPast() {
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Old notes");
+		PastMeeting pastMeetingWithNotes = this.contactManager.addMeetingNotes(1, "New notes");
+
+		assertEquals("The notes were not changed to the new version.", "New notes", pastMeetingWithNotes.getNotes());
+	}
 }	

@@ -15,47 +15,33 @@ public class ContactManagerImpl implements ContactManager {
 	}
 
 	/**
-	 * Works out the ID that should be assigned to the meeting that
-	 * is being added to the set. Takes the most recent ID (which will be
-	 * the key) and increments it by one.
+	 * Works out the ID that should be assigned to the object that
+	 * is being added to the map. Works out the highest ID and increments it by one.
 	 *
 	 * @return int
 	 * @access private
 	 */
-	private int workoutNextIdIncrementForMeetings() {
-		Set<Integer> keys      = this.meetings.keySet();
-		Object[]     keysArray = keys.toArray();
+	private int workoutNextIdIncrement(Set<Integer> keys) {
 
-		int key = 1;
+		int maxKey = 0;
+
 		if (!keys.isEmpty()) {
-			key = (int) keysArray[keys.size() - 1] + 1;
+			Iterator<Integer> iterator = keys.iterator();
+			while (iterator.hasNext()) {
+				Integer i = iterator.next();
+
+				if (i > maxKey) {
+					maxKey = i;
+				}
+			}
 		}
 
-		return key;
-	}
-
-	/**
-	 * Works out the ID that should be assigned to the contact that
-	 * is being added to the Map. Takes the most recent ID (which will be
-	 * the key) and increments it by 1.
-	 *
-	 * @return int
-	 * @access private
-	 */
-	private int workoutNextIdIncrementForContacts() {
-		Set<Integer> keys      = this.contacts.keySet();
-		Object[]     keysArray = keys.toArray();
-
-		int key = 1;
-		if (!keys.isEmpty()) {
-			key = (int) keysArray[keys.size() - 1] + 1;
-		}
-
-		return key;
+		return maxKey + 1;
 	}
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
@@ -80,7 +66,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("All contacts must exist in the contact manager. Use the method addNewContact to add a new contact.");
 		}
 		
-		int key = this.workoutNextIdIncrementForMeetings();
+		int key = this.workoutNextIdIncrement(this.meetings.keySet());
 		Meeting newMeeting = new FutureMeetingImpl(key, date, contacts);
 		this.meetings.put(key, newMeeting);
 
@@ -89,6 +75,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public PastMeeting getPastMeeting(int id) {
@@ -109,6 +96,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public FutureMeeting getFutureMeeting(int id) {
@@ -129,6 +117,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public Meeting getMeeting(int id) {
@@ -142,6 +131,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public List<Meeting> getFutureMeetingList(Contact contact) {
@@ -182,6 +172,10 @@ public class ContactManagerImpl implements ContactManager {
 		return futureMeetingList;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @author David Jones
+	 */
 	@Override
 	public List<Meeting> getMeetingListOn(Calendar date) {
 
@@ -217,6 +211,10 @@ public class ContactManagerImpl implements ContactManager {
 		return meetings;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @author David Jones
+	 */
 	@Override
 	public List<PastMeeting> getPastMeetingListFor(Contact contact) {
 
@@ -251,6 +249,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
@@ -271,18 +270,45 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("The set of contacts must have at least one contact.");
 		}
 
-		int key = this.workoutNextIdIncrementForMeetings();
+		int key = this.workoutNextIdIncrement(this.meetings.keySet());
 		Meeting newPastMeeting = new PastMeetingImpl(key, date, contacts, text);
 		this.meetings.put(key, newPastMeeting);
 	}
 
-	// //@TODO
-	// public PastMeeting addMeetingNotes(int id, String text) {
+	/**
+	 * {@inheritDoc}
+	 * @author David Jones
+	 */
+	@Override
+	public PastMeeting addMeetingNotes(int id, String text) {
+		
+		if (text == null) {
+			throw new NullPointerException("The notes cannot be null.");
+		}
 
-	// }
+		Meeting meeting = this.getMeeting(id);
+
+		if (meeting == null) {
+			throw new IllegalArgumentException("A meeting with the ID of '" + id + "' does not exist.");
+		}
+
+		Calendar now = Calendar.getInstance();
+
+		if (meeting.getDate().after(now)) {
+			throw new IllegalStateException("The selected meeting exists but is a future meeting. An ID of a past meeting must be supplied.");
+		}
+
+		this.meetings.remove(meeting.getId());
+
+		Meeting pastMeeting = new PastMeetingImpl(meeting.getId(), meeting.getDate(), meeting.getContacts(), text);
+		this.meetings.put(pastMeeting.getId(), pastMeeting);
+
+		return (PastMeeting) pastMeeting;
+	}
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public int addNewContact(String name, String notes) {
@@ -303,7 +329,7 @@ public class ContactManagerImpl implements ContactManager {
 			throw new IllegalArgumentException("Notes cannot be an empty string.");
 		}
 
-		int id = this.workoutNextIdIncrementForContacts();
+		int id = this.workoutNextIdIncrement(this.contacts.keySet());
 
 		Contact contact = new ContactImpl(id, name, notes);
 		this.contacts.put(id, contact);
@@ -313,6 +339,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public Set<Contact> getContacts(String name) {
@@ -339,6 +366,7 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * {@inheritDoc}
+	 * @author David Jones
 	 */
 	@Override
 	public Set<Contact> getContacts(int... ids) {
@@ -358,6 +386,8 @@ public class ContactManagerImpl implements ContactManager {
 
 		return contacts;
 	}
+
+	// @TODO - might be able to combine the below two methods
 
 	/**
 	 * Takes a set of contacts and loops through the saved contacts
