@@ -7,11 +7,40 @@ import java.util.*;
 public class ContactManagerImpl implements ContactManager {
 
 	private LinkedHashMap<Integer, Meeting> meetings;
-	private LinkedHashMap<Integer, Contact> contacts; 
+	private LinkedHashMap<Integer, Contact> contacts;
+
+	private final String FILENAME = "contacts.txt"; 
 
 	ContactManagerImpl() {
 		this.meetings = new LinkedHashMap<Integer, Meeting>();
 		this.contacts = new LinkedHashMap<Integer, Contact>();
+	}
+
+	/**
+	 * A getter for the filename.
+	 * @return String
+	 * @author David Jones
+	 */
+	public String getFilename() {
+		return this.FILENAME;
+	}
+
+	/**
+	 * A getter for the meetings.
+	 * @return LinkedHashMap<Integer, Meeting>
+	 * @author David Jones
+	 */
+	public LinkedHashMap<Integer, Meeting> getMeetings() {
+		return this.meetings;
+	}
+
+	/**
+	 * A getter for the contacts.
+	 * @return LinkedHashedMap<Integer, Contact>
+	 * @author David Jones
+	 */
+	public LinkedHashMap<Integer, Contact> getContacts() {
+		return this.contacts;
 	}
 
 	/**
