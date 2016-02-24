@@ -162,6 +162,6 @@ public interface ContactManager {
 	* This method must be executed when the program is
 	* closed and when/if the user requests it.
 	*/
-	// void flush();
+	void flush();
 
 }

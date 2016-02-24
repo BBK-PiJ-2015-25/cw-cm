@@ -314,11 +314,11 @@ public class ContactManagerImpl implements ContactManager {
 	public int addNewContact(String name, String notes) {
 
 		if (name == null) {
-			throw new IllegalArgumentException("Name cannot be null.");
+			throw new NullPointerException("Name cannot be null.");
 		}
 
 		if (notes == null) {
-			throw new IllegalArgumentException("Notes cannot be null.");
+			throw new NullPointerException("Notes cannot be null.");
 		}
 
 		if (name == "") {
@@ -387,11 +387,9 @@ public class ContactManagerImpl implements ContactManager {
 		return contacts;
 	}
 
-	// @TODO - might be able to combine the below two methods
-
 	/**
 	 * Takes a set of contacts and loops through the saved contacts
-	 * a checks whether they exist. If any one of the contacts passed
+	 * and checks whether they exist. If any one of the contacts passed
 	 * into this method does not exist then false is returned. Otherwise
 	 * true is returned.
 	 *
@@ -430,8 +428,12 @@ public class ContactManagerImpl implements ContactManager {
 		return false;
 	}
 
-	// //@TODO
-	// public void flush() {
+	/**
+	 * {@inheritDoc}
+	 * @author David Jones
+	 */
+	@Override
+	public void flush() {
 		
-	// }
+	}
 }

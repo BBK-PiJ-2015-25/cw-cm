@@ -277,12 +277,12 @@ public class ContactManagerTest {
 		this.contactManager.addNewContact("David Jones", "");
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testAddNewContactNullName() {
 		this.contactManager.addNewContact(null, "Some Notes");
 	}
 
-	@Test(expected=IllegalArgumentException.class)
+	@Test(expected=NullPointerException.class)
 	public void testAddNewContactNullNotes() {
 		this.contactManager.addNewContact("David Jones", null);
 	}
