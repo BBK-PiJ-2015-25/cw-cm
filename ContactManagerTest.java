@@ -1,6 +1,7 @@
 import static org.junit.Assert.*;
 import org.junit.*;
 import java.util.*;
+import java.io.*;
 // import java.util.Calendar;
 // import java.util.Set;
 // import java.util.HashSet;
@@ -12,7 +13,8 @@ public class ContactManagerTest {
 	private Contact 	   contact;
 	private Calendar 	   aFutureDate;
 	private Calendar 	   aPastDate;
-
+	private final String   FILENAME = "contacts.txt";
+ 
 	@Before
 	public void setUp() {
 		Calendar futureDate = Calendar.getInstance();
@@ -32,6 +34,13 @@ public class ContactManagerTest {
 		Set<Contact> contacts  = contactManager.getContacts(contactId);
 		Object[] contactsArray = contacts.toArray();
 		this.contact = (Contact) contactsArray[0];
+
+		// Make sure the cache file is deleted before the test begins
+		File cacheFile = new File(this.FILENAME);
+		if (cacheFile.exists()) {
+			cacheFile.delete();
+		}
+
 	}
 
 	@Test(expected=NullPointerException.class)
@@ -483,5 +492,40 @@ public class ContactManagerTest {
 		PastMeeting pastMeetingWithNotes = this.contactManager.addMeetingNotes(1, "New notes");
 
 		assertEquals("The notes were not changed to the new version.", "New notes", pastMeetingWithNotes.getNotes());
+	}
+
+	@Test
+	public void testFlushCreatesTheFile() {
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.flush();
+
+		File fileCheck = new File(this.FILENAME);
+
+		assertTrue(fileCheck.exists());
+	}
+
+	@Test
+	public void testFlushContainTheCorrectNumberContacts() {
+
+		this.contactManager.addNewContact("David Jones", "My notes");
+		this.contactManager.flush();
+
+		ContactManagerImpl newContactManager = new ContactManagerImpl();
+		Set<Contact> contacts = newContactManager.getContacts("");
+
+		assertEquals("The contact manager should contain 2 contacts", 2, contacts.size());
+	}
+
+	@Test
+	public void testFlushContainTheCorrectNumberMeetings() {
+
+		this.contactManager.addFutureMeeting(this.contacts, this.aFutureDate);
+		this.contactManager.addNewPastMeeting(this.contacts, this.aPastDate, "Some notes");
+		this.contactManager.flush();
+
+		ContactManagerImpl newContactManager = new ContactManagerImpl();
+		LinkedHashMap<Integer, Meeting> meetings = newContactManager.getMeetings();
+
+		assertEquals("The contact manager should contain 2 meetings", 2, meetings.size());
 	}
 }	

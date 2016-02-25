@@ -1,4 +1,5 @@
 import java.util.*;
+import java.io.*;
 // import java.util.Set;
 // import java.util.Iterator;
 // import java.util.LinkedHashMap;
@@ -14,6 +15,8 @@ public class ContactManagerImpl implements ContactManager {
 	ContactManagerImpl() {
 		this.meetings = new LinkedHashMap<Integer, Meeting>();
 		this.contacts = new LinkedHashMap<Integer, Contact>();
+
+		this.setCachedData();
 	}
 
 	/**
@@ -36,11 +39,33 @@ public class ContactManagerImpl implements ContactManager {
 
 	/**
 	 * A getter for the contacts.
-	 * @return LinkedHashedMap<Integer, Contact>
+	 * @return LinkedHashMap<Integer, Meeting>
 	 * @author David Jones
 	 */
 	public LinkedHashMap<Integer, Contact> getContacts() {
 		return this.contacts;
+	}
+
+	/**
+	 * Setter for the meetings.
+	 *
+	 * @param  LinkedHashMap<Integer, Contact> A linked hash map of meetings
+	 * @return void
+	 * @author David Jones
+	 */
+	public void setMeetings(LinkedHashMap<Integer, Meeting> meetings) {
+		this.meetings = meetings;
+	}
+
+	/**
+	 * Setter for the contacts.
+	 *
+	 * @param  LinkedHashMap<Integer, Contact> A linked hash map of contacts
+	 * @return void
+	 * @author David Jones 
+	 */
+	public void setContacts(LinkedHashMap<Integer, Contact> contacts) {
+		this.contacts = contacts;
 	}
 
 	/**
@@ -458,11 +483,74 @@ public class ContactManagerImpl implements ContactManager {
 	}
 
 	/**
+	 * Checks that the cached file exists and returns a boolean outcome.
+	 *
+	 * @return boolean
+	 * @author David Jones
+	 */
+	public boolean cacheFileExists() {
+		File cacheFile = new File(this.getFilename());
+		return cacheFile.exists();
+	}
+
+	/**
+	 * Returns the data from the cached file and assigns it to the relevant properties.
+	 * This method will overwrite anything that is already saved. This should only be
+	 * run in the constructor.
+	 *
+	 * @return void
+	 * @author David Jones
+	 */
+	private void setCachedData() {
+		if (this.cacheFileExists()) {
+
+			try {
+
+				FileInputStream file    = new FileInputStream(this.FILENAME);
+				ObjectInputStream input = new ObjectInputStream(file);
+
+				LinkedHashMap<Integer, Meeting> meetings = (LinkedHashMap<Integer, Meeting>) input.readObject();
+				LinkedHashMap<Integer, Contact> contacts = (LinkedHashMap<Integer, Contact>) input.readObject();
+
+				this.setMeetings(meetings);
+				this.setContacts(contacts);
+
+				file.close();
+				input.close();
+
+			} catch (Exception ex) {
+				System.out.println("An exception has been thrown 1");
+				System.out.println(ex.getMessage());
+			}
+
+		}
+	}
+
+	/**
 	 * {@inheritDoc}
 	 * @author David Jones
 	 */
 	@Override
 	public void flush() {
 		
+		try {
+			// Delete the file to make sure we don't append to old data
+			if (this.cacheFileExists()) {
+				File cacheFile = new File(this.FILENAME);
+				cacheFile.delete();
+			}
+
+			FileOutputStream file     = new FileOutputStream(this.getFilename());
+			ObjectOutputStream output = new ObjectOutputStream(file);
+
+			output.writeObject(this.getMeetings());
+			output.writeObject(this.getContacts());
+			output.close();
+			file.close();
+
+		} catch (Exception ex) {
+			System.out.println("An exception has been caught.");
+			System.out.println(ex.getMessage());
+		}
 	}
 }
