@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.Comparator;
 
 /**
  * This is the comparison test for organizing a list by

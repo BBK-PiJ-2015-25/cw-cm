@@ -1,9 +1,17 @@
-import java.util.*;
-import java.io.*;
-// import java.util.Set;
-// import java.util.Iterator;
-// import java.util.LinkedHashMap;
-// import java.util.Arrays;
+import java.util.Set;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.HashSet;
+import java.util.Calendar;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.File;
 
 public class ContactManagerImpl implements ContactManager {
 
@@ -98,7 +106,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public int addFutureMeeting(Set<Contact> contacts, Calendar date) {
+	public int addFutureMeeting(Set<Contact> contacts, Calendar date) throws NullPointerException, IllegalArgumentException {
 		if (contacts == null) {
 			throw new NullPointerException("Contacts cannot be null.");
 		}
@@ -132,7 +140,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public PastMeeting getPastMeeting(int id) {
+	public PastMeeting getPastMeeting(int id) throws IllegalStateException {
 
 		if (!this.meetings.containsKey(id)) {
 			return null;
@@ -153,7 +161,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public FutureMeeting getFutureMeeting(int id) {
+	public FutureMeeting getFutureMeeting(int id) throws IllegalStateException {
 		
 		if (!this.meetings.containsKey(id)) {
 			return null;
@@ -188,7 +196,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public List<Meeting> getFutureMeetingList(Contact contact) {
+	public List<Meeting> getFutureMeetingList(Contact contact) throws IllegalArgumentException {
 
 		if (!this.checkContactExists(contact)) {
 			throw new IllegalArgumentException("The contact does not exist. You can add a new contact using the addNewContact method.");
@@ -231,7 +239,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public List<Meeting> getMeetingListOn(Calendar date) {
+	public List<Meeting> getMeetingListOn(Calendar date) throws NullPointerException {
 
 		if (date == null) {
 			throw new NullPointerException("The date cannot be null.");
@@ -270,7 +278,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public List<PastMeeting> getPastMeetingListFor(Contact contact) {
+	public List<PastMeeting> getPastMeetingListFor(Contact contact) throws NullPointerException {
 
 		if (contact == null) {
 			throw new NullPointerException("The contact cannot be null.");
@@ -306,7 +314,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) {
+	public void addNewPastMeeting(Set<Contact> contacts, Calendar date, String text) throws NullPointerException, IllegalArgumentException {
 
 		if (contacts == null) {
 			throw new NullPointerException("Contacts cannot be null.");
@@ -334,7 +342,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public PastMeeting addMeetingNotes(int id, String text) {
+	public PastMeeting addMeetingNotes(int id, String text) throws NullPointerException, IllegalArgumentException, IllegalStateException {
 		
 		if (text == null) {
 			throw new NullPointerException("The notes cannot be null.");
@@ -365,7 +373,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public int addNewContact(String name, String notes) {
+	public int addNewContact(String name, String notes) throws NullPointerException, IllegalArgumentException {
 
 		if (name == null) {
 			throw new NullPointerException("Name cannot be null.");
@@ -396,7 +404,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public Set<Contact> getContacts(String name) {
+	public Set<Contact> getContacts(String name) throws NullPointerException {
 
 		if (name == null) {
 			throw new NullPointerException("The contact name cannot be null.");
@@ -423,7 +431,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @author David Jones
 	 */
 	@Override
-	public Set<Contact> getContacts(int... ids) {
+	public Set<Contact> getContacts(int... ids) throws NullPointerException {
 
 		if (ids == null) {
 			throw new NullPointerException("The list of ids cannot be null.");

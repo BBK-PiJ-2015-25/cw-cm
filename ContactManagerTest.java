@@ -1,10 +1,8 @@
 import static org.junit.Assert.*;
 import org.junit.*;
+
 import java.util.*;
 import java.io.*;
-// import java.util.Calendar;
-// import java.util.Set;
-// import java.util.HashSet;
 
 public class ContactManagerTest {
 
@@ -273,7 +271,7 @@ public class ContactManagerTest {
 			success = false;
 		}
 
-		assertEquals("The meetings were not in order", true, success);
+		assertTrue(success);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -326,7 +324,7 @@ public class ContactManagerTest {
 		ContactManager contactManager = new ContactManagerImpl();
 		Set<Contact> contacts = contactManager.getContacts("");
 
-		assertEquals("The returned contacts list should be empty.", true, contacts.isEmpty());
+		assertTrue(contacts.isEmpty());
 	}
 
 	@Test
@@ -370,7 +368,7 @@ public class ContactManagerTest {
 
 		Set<Contact> contacts = contactManager.getContacts(ids);
 
-		assertEquals("The contacts set should be empty.", true, contacts.isEmpty());
+		assertTrue(contacts.isEmpty());
 	}
 
 	@Test
@@ -402,7 +400,7 @@ public class ContactManagerTest {
 
 		List<Meeting> meetings = this.contactManager.getMeetingListOn(date);
 
-		assertEquals("We were expecting an empty list of meetings as non have been set yet.", true, meetings.isEmpty());
+		assertTrue(meetings.isEmpty());
 	}
 
 	@Test
@@ -415,7 +413,7 @@ public class ContactManagerTest {
 
 		List<Meeting> meetings = this.contactManager.getMeetingListOn(date);
 
-		assertEquals("We are expecting an empty list of meetings as with a matching date been set yet.", true, meetings.isEmpty());
+		assertTrue(meetings.isEmpty());
 	}
 
 	@Test
@@ -442,7 +440,7 @@ public class ContactManagerTest {
 		Contact contact = new ContactImpl(1, "David Jones", "Some Notes");
 		List<PastMeeting> pastMeetings = this.contactManager.getPastMeetingListFor(contact);
 
-		assertEquals("We are expecting an empty list of past meetings.", true, pastMeetings.isEmpty());
+		assertTrue(pastMeetings.isEmpty());
 	}
 
 	@Test
@@ -453,7 +451,7 @@ public class ContactManagerTest {
 
 		List<PastMeeting> pastMeetings = this.contactManager.getPastMeetingListFor(this.contact);
 
-		assertEquals("The list should be empty as we have no past meetings.", true, pastMeetings.isEmpty());
+		assertTrue(pastMeetings.isEmpty());
 	}
 
 	@Test
