@@ -496,7 +496,7 @@ public class ContactManagerImpl implements ContactManager {
 	 * @return boolean
 	 * @author David Jones
 	 */
-	public boolean cacheFileExists() {
+	private boolean cacheFileExists() {
 		File cacheFile = new File(this.getFilename());
 		return cacheFile.exists();
 	}
@@ -527,8 +527,7 @@ public class ContactManagerImpl implements ContactManager {
 				input.close();
 
 			} catch (Exception ex) {
-				System.out.println("An exception has been thrown 1");
-				System.out.println(ex.getMessage());
+				ex.printStackTrace();
 			}
 
 		}
@@ -557,8 +556,7 @@ public class ContactManagerImpl implements ContactManager {
 			file.close();
 
 		} catch (Exception ex) {
-			System.out.println("An exception has been caught.");
-			System.out.println(ex.getMessage());
+			ex.printStackTrace();
 		}
 	}
 }
